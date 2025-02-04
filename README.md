@@ -242,67 +242,66 @@ GROUP BY c.category_id;
 - Partitioned the `orderdetails` table for improved performance.
   ```sql
   -- Renme exist orderdetails to orderdetails_old
-ALTER TABLE orderdetails RENAME TO orderdetails_old;
-
-
--- Create a new partitioned table.
- CREATE TABLE orderdetails (
-    order_detail_id SERIAL PRIMARY KEY,
-    order_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL CHECK (quantity > 0),
-    unit_price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES Orders (order_id),
-    FOREIGN KEY (product_id) REFERENCES Products (product_id)
-)PARTITION BY RANGE (order_detail_id);
-
--- Partition 1
-CREATE TABLE orderdetails_p1 PARTITION OF orderdetails
-FOR VALUES FROM (40462) TO (1040461);
-
--- Partition 2
-CREATE TABLE orderdetails_p2 PARTITION OF orderdetails
-FOR VALUES FROM (1040461) TO (2040461);
-
--- Partition 3
-CREATE TABLE orderdetails_p3 PARTITION OF orderdetails
-FOR VALUES FROM (2040461) TO (3040461);
-
--- Partition 4
-CREATE TABLE orderdetails_p4 PARTITION OF orderdetails
-FOR VALUES FROM (3040461) TO (4040461);
-
--- Partition 5
-CREATE TABLE orderdetails_p5 PARTITION OF orderdetails
-FOR VALUES FROM (4040461) TO (5040461);
-
--- Partition 6
-CREATE TABLE orderdetails_p6 PARTITION OF orderdetails
-FOR VALUES FROM (5040461) TO (6040461);
-
--- Partition 7
-CREATE TABLE orderdetails_p7 PARTITION OF orderdetails
-FOR VALUES FROM (6040461) TO (7040461);
-
--- Partition 8
-CREATE TABLE orderdetails_p8 PARTITION OF orderdetails
-FOR VALUES FROM (7040461) TO (8040461);
-
--- Partition 9
-CREATE TABLE orderdetails_p9 PARTITION OF orderdetails
-FOR VALUES FROM (8040461) TO (9040461);
-
--- Partition 10
-CREATE TABLE orderdetails_p10 PARTITION OF orderdetails
-FOR VALUES FROM (9040461) TO (10040465);
-
--- Copy data from the old table to the new one
-INSERT INTO orderdetails (order_detail_id, order_id, product_id, quantity, unit_price)
-SELECT order_detail_id, order_id, product_id, quantity, unit_price FROM orderdetails_old;
-
--- Drop the old table once migration is complete.
-DROP TABLE orderdetails_old;
-
+    ALTER TABLE orderdetails RENAME TO orderdetails_old;
+    
+    
+    -- Create a new partitioned table.
+     CREATE TABLE orderdetails (
+        order_detail_id SERIAL PRIMARY KEY,
+        order_id INT NOT NULL,
+        product_id INT NOT NULL,
+        quantity INT NOT NULL CHECK (quantity > 0),
+        unit_price DECIMAL(10, 2) NOT NULL,
+        FOREIGN KEY (order_id) REFERENCES Orders (order_id),
+        FOREIGN KEY (product_id) REFERENCES Products (product_id)
+    )PARTITION BY RANGE (order_detail_id);
+    
+    -- Partition 1
+    CREATE TABLE orderdetails_p1 PARTITION OF orderdetails
+    FOR VALUES FROM (40462) TO (1040461);
+    
+    -- Partition 2
+    CREATE TABLE orderdetails_p2 PARTITION OF orderdetails
+    FOR VALUES FROM (1040461) TO (2040461);
+    
+    -- Partition 3
+    CREATE TABLE orderdetails_p3 PARTITION OF orderdetails
+    FOR VALUES FROM (2040461) TO (3040461);
+    
+    -- Partition 4
+    CREATE TABLE orderdetails_p4 PARTITION OF orderdetails
+    FOR VALUES FROM (3040461) TO (4040461);
+    
+    -- Partition 5
+    CREATE TABLE orderdetails_p5 PARTITION OF orderdetails
+    FOR VALUES FROM (4040461) TO (5040461);
+    
+    -- Partition 6
+    CREATE TABLE orderdetails_p6 PARTITION OF orderdetails
+    FOR VALUES FROM (5040461) TO (6040461);
+    
+    -- Partition 7
+    CREATE TABLE orderdetails_p7 PARTITION OF orderdetails
+    FOR VALUES FROM (6040461) TO (7040461);
+    
+    -- Partition 8
+    CREATE TABLE orderdetails_p8 PARTITION OF orderdetails
+    FOR VALUES FROM (7040461) TO (8040461);
+    
+    -- Partition 9
+    CREATE TABLE orderdetails_p9 PARTITION OF orderdetails
+    FOR VALUES FROM (8040461) TO (9040461);
+    
+    -- Partition 10
+    CREATE TABLE orderdetails_p10 PARTITION OF orderdetails
+    FOR VALUES FROM (9040461) TO (10040465);
+    
+    -- Copy data from the old table to the new one
+    INSERT INTO orderdetails (order_detail_id, order_id, product_id, quantity, unit_price)
+    SELECT order_detail_id, order_id, product_id, quantity, unit_price FROM orderdetails_old;
+    
+    -- Drop the old table once migration is complete.
+    DROP TABLE orderdetails_old;
   ```
 - Created an index on `product_id`:
 
