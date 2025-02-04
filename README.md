@@ -113,7 +113,7 @@ ORDER BY TotalQuantity DESC;
 **Query:**
 
 ```sql
-SELECT CONCAT(first_name,' ',last_name) AS CustomerName,
+SELECT first_name|| ' ' ||last_name AS CustomerName,
        SUM(total_amount) AS TotalAmount,
        order_date AS OrderDate
 FROM orders O
@@ -240,6 +240,7 @@ GROUP BY c.category_id;
 **Optimization Techniques:**
 
 - Partitioned the `orderdetails` table for improved performance.
+  
   ```sql
   -- Renme exist orderdetails to orderdetails_old
     ALTER TABLE orderdetails RENAME TO orderdetails_old;
