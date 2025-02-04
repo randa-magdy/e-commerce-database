@@ -24,11 +24,13 @@ The database consists of five main tables:
 -- Create the database
 CREATE DATABASE e-commerce;
 
+-- Create the Categories table
 CREATE TABLE Categories (
     category_id SERIAL PRIMARY KEY,
     category_name VARCHAR(100) UNIQUE CHECK(CHAR_LENGTH(category_name) > 3)
 );
 
+-- Create the Products table
 CREATE TABLE Products (
     product_id SERIAL PRIMARY KEY,
     category_id INT,
@@ -39,6 +41,7 @@ CREATE TABLE Products (
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
 
+-- Create the Customers table
 CREATE TABLE Customers (
     customer_id SERIAL PRIMARY KEY,
     first_name VARCHAR(30) NOT NULL CHECK (CHAR_LENGTH(first_name) > 2),
@@ -47,6 +50,7 @@ CREATE TABLE Customers (
     password VARCHAR(225) NOT NULL CHECK (CHAR_LENGTH(password) > 5)
 );
 
+-- Create the Orders table
 CREATE TABLE Orders (
     order_id SERIAL PRIMARY KEY,
     customer_id INT,
@@ -55,6 +59,7 @@ CREATE TABLE Orders (
     FOREIGN KEY (customer_id) REFERENCES Customers (customer_id)
 );
 
+-- Create the OrderDetails table
 CREATE TABLE OrderDetails (
     order_detail_id SERIAL PRIMARY KEY,
     order_id INT NOT NULL,
