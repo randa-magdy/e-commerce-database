@@ -16,7 +16,7 @@ The database consists of five main tables:
 
 ### ERD Diagram
 
-![ERD Diagram](./erd_diagram.png) 
+![ERD Diagram](./ecommerce-erd-diagram.png) 
 
 ## Database Schema Script
 
