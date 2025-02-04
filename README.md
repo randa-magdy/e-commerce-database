@@ -16,7 +16,7 @@ The database consists of five main tables:
 
 ### ERD Diagram
 
-*(ERD Diagram image)*
+![ERD Diagram](./erd_diagram.png) 
 
 ## Database Schema Script
 
