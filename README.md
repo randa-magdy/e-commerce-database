@@ -21,6 +21,9 @@ The database consists of five main tables:
 ## Database Schema Script
 
 ```sql
+-- Create the database
+CREATE DATABASE e-commerce;
+
 CREATE TABLE Categories (
     category_id SERIAL PRIMARY KEY,
     category_name VARCHAR(100) UNIQUE CHECK(CHAR_LENGTH(category_name) > 3)
