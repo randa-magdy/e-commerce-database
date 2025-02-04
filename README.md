@@ -113,7 +113,7 @@ ORDER BY TotalQuantity DESC;
 **Query:**
 
 ```sql
-SELECT first_name|| ' ' ||last_name AS CustomerName,
+SELECT first_name || ' ' || last_name AS CustomerName,
        SUM(total_amount) AS TotalAmount,
        order_date AS OrderDate
 FROM orders O
