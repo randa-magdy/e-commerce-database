@@ -89,9 +89,32 @@ CREATE TABLE OrderDetails (
 ```sql
 SELECT DATE(order_date) AS OrderDate, SUM(total_amount) AS DailyRevenue
 FROM Orders
-WHERE DATE(order_date) = '2023-10-21'
+WHERE DATE(order_date) = '2025-02-03'
 GROUP BY DATE(order_date);
 ```
+
+**Execution Time Before Optimization:** 699.857 ms
+
+
+**Execution Time After Optimization:** 21.169 ms
+
+**Optimization Techniques:**
+
+- Rewrite the query using a **Range Condition** for the **order date** in the `WHERE` clause:
+
+```sql
+SELECT DATE(order_date) AS OrderDate, SUM(total_amount) AS DailyRevenue
+FROM Orders
+WHERE order_date >= '2025-02-03 00:00:00' AND order_date < '2025-02-04 00:00:00'
+GROUP BY DATE(order_date);
+```
+
+- Created an index on order date:
+
+```sql
+CREATE INDEX idx_orders_order_date ON orders(order_date);
+```
+
 
 ### 2. Monthly Top-Selling Products Report
 
