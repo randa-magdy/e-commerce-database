@@ -145,6 +145,7 @@ ORDER BY
 **Optimization Techniques:**
 
 - Apply Denormalization to Reduce Joins by Combining Data:
+  
     **Steps to Apply Denormalization:**
   
     **Step 1**: Create a **Denormalized Table**:
