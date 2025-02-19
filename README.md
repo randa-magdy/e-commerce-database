@@ -95,7 +95,6 @@ GROUP BY DATE(order_date);
 
 **Execution Time Before Optimization:** 699.857 ms
 
-
 **Execution Time After Optimization:** 21.169 ms
 
 **Optimization Techniques:**
@@ -121,14 +120,82 @@ CREATE INDEX idx_orders_order_date ON orders(order_date);
 **Query:**
 
 ```sql
-SELECT DATE_FORMAT(order_date, '%Y-%m') AS Month,
-       (SELECT name FROM products P WHERE P.product_id = OD.product_id) AS ProductName,
-       SUM(quantity) AS TotalQuantity
-FROM orderdetails OD
-JOIN orders O ON O.order_id = OD.order_id
-WHERE DATE_FORMAT(order_date, '%Y-%m') = '2025-01'
-GROUP BY product_id
-ORDER BY TotalQuantity DESC;
+SELECT 
+    TO_CHAR(O.order_date, 'YYYY-MM') AS Month,
+    P.name AS ProductName,
+    SUM(OD.quantity) AS TotalQuantity
+FROM 
+    orderdetails OD
+JOIN 
+    orders O ON O.order_id = OD.order_id
+JOIN 
+    products P ON P.product_id = OD.product_id
+WHERE 
+    TO_CHAR(O.order_date, 'YYYY-MM') = '2025-01'
+GROUP BY 
+    TO_CHAR(O.order_date, 'YYYY-MM'), P.name, P.product_id
+ORDER BY 
+    TotalQuantity DESC;
+```
+
+**Execution Time Before Optimization:** 12894.256 ms
+
+**Execution Time After Optimization:** 2376.915 ms
+
+**Optimization Techniques:**
+
+- Apply Denormalization to Reduce Joins by Combining Data:
+    **Steps to Apply Denormalization:**
+  
+    **Step 1**: Create a **Denormalized Table**:
+      
+    ```sql
+    CREATE TABLE denormalized_orders_products(
+    	order_id INT , 
+    	product_id INT ,
+    	product_name VARCHAR(250) NOT NULL CHECK(CHAR_LENGTH(product_name) > 3),
+    	order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    	quantity INT NOT NULL CHECK (quantity > 0)
+    );
+    ```
+    **Step 2**: Fiiling the Denormalized Table:
+    
+    ```sql
+    INSERT INTO denormalized_orders_products (order_id, product_id, product_name, order_date, quantity)
+    SELECT 
+        O.order_id,
+        OD.product_id,
+        P.name AS product_name,
+        O.order_date,
+        OD.quantity
+    FROM 
+        orderdetails OD
+    JOIN 
+        orders O ON O.order_id = OD.order_id
+    JOIN 
+        products P ON P.product_id = OD.product_id;
+    ```
+
+    **Step 3**: Query the Denormalized Table:
+    ```sql
+    SELECT 
+        TO_CHAR(order_date, 'YYYY-MM') AS Month,
+        product_name,
+        SUM(quantity) AS TotalQuantity
+    FROM 
+        denormalized_orders_products
+    WHERE order_date >= '2025-01-01 00:00:00' AND order_date < '2025-02-01 00:00:00'
+    	
+    GROUP BY 
+        TO_CHAR(order_date, 'YYYY-MM'), product_name
+    ORDER BY 
+        TotalQuantity DESC;
+    ```
+
+- Created a **Covering Index** that includes **(order_date,product_name,quantity)**:
+    
+```sql
+CREATE INDEX idx_orderdate_productname_productquantity ON denormalized_orders_products(order_date,product_name,quantity) 
 ```
 
 ### 3. Customers with Orders Totaling More Than \$500 in the Past Month
