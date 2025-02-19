@@ -228,8 +228,8 @@ CREATE INDEX idx_orders_covering ON orders (customer_id, order_date,total_amount
 ```sql
 SELECT c.category_id, c.category_name, COUNT(p.product_id) AS total_products
 FROM categories c LEFT JOIN products p ON c.category_id=p.category_id
-GROUP BY c.category_id, c.category_name
-ORDER BY c.category_id, c.category_name;
+GROUP BY c.category_id
+ORDER BY c.category_id;
 ```
 
 **Execution Time Before Optimization:** 184.443 ms
