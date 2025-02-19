@@ -204,14 +204,51 @@ CREATE INDEX idx_orderdate_productname_productquantity ON denormalized_orders_pr
 **Query:**
 
 ```sql
-SELECT first_name || ' ' || last_name AS CustomerName,
-       SUM(total_amount) AS TotalAmount,
-       order_date AS OrderDate
-FROM orders O
-JOIN customers C ON O.customer_id = C.customer_id
-WHERE order_date < DATE_SUB(NOW(), INTERVAL 1 MONTH)
-GROUP BY C.customer_id
-HAVING SUM(total_amount) > 500;
+SELECT 
+    C.first_name || ' ' || C.last_name AS CustomerName,
+    SUM(O.total_amount) AS TotalAmount
+FROM 
+    orders O
+JOIN 
+    customers C ON O.customer_id = C.customer_id
+WHERE 
+    O.order_date >= DATE_TRUNC('day', NOW()) - INTERVAL '1 month'
+GROUP BY 
+    C.customer_id, C.first_name, C.last_name
+HAVING 
+    SUM(O.total_amount) > 500;
+```
+**Execution Time Before Optimization:** 4896.671 ms
+
+**Execution Time After Optimization:** 1588.361 ms
+
+**Optimization Techniques:**
+
+- Rewrite the query by using only C.customer_id in `GROUP BY` clause:
+```sql
+SELECT 
+    C.first_name || ' ' || C.last_name AS CustomerName,
+    SUM(O.total_amount) AS TotalAmount
+FROM 
+    orders O
+JOIN 
+    customers C ON O.customer_id = C.customer_id
+WHERE 
+    O.order_date >= DATE_TRUNC('day', NOW()) - INTERVAL '1 month'
+GROUP BY 
+    C.customer_id
+HAVING 
+    SUM(O.total_amount) > 500;
+```
+
+- Created an **Index** for **(customer_id)** column in the orders table:
+```sql
+CREATE INDEX idx_orders_customer_id ON orders (customer_id)
+```
+
+- Created a **Covering Index** that includes **(customer_id, order_date,total_amount)**:
+```sql
+CREATE INDEX idx_orders_covering ON orders (customer_id, order_date,total_amount);
 ```
 
 ### 4. Total Number of Products in Each Category
