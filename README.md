@@ -80,7 +80,7 @@ CREATE TABLE OrderDetails (
 );
 ```
 
-## SQL Queries
+## SQL Queries Before & After Optimization 
 
 ### 1. Daily Revenue Report for a specific date
 
@@ -145,8 +145,6 @@ WHERE order_date < DATE_SUB(NOW(), INTERVAL 1 MONTH)
 GROUP BY C.customer_id
 HAVING SUM(total_amount) > 500;
 ```
-
-## SQL Queries Before & After Optimization 
 
 ### 4. Total Number of Products in Each Category
 
