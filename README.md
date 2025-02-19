@@ -114,7 +114,6 @@ GROUP BY DATE(order_date);
 CREATE INDEX idx_orders_order_date ON orders(order_date);
 ```
 
-
 ### 2. Monthly Top-Selling Products Report
 
 **Query:**
@@ -124,18 +123,12 @@ SELECT
     TO_CHAR(O.order_date, 'YYYY-MM') AS Month,
     P.name AS ProductName,
     SUM(OD.quantity) AS TotalQuantity
-FROM 
-    orderdetails OD
-JOIN 
-    orders O ON O.order_id = OD.order_id
-JOIN 
-    products P ON P.product_id = OD.product_id
-WHERE 
-    TO_CHAR(O.order_date, 'YYYY-MM') = '2025-01'
-GROUP BY 
-    TO_CHAR(O.order_date, 'YYYY-MM'), P.name, P.product_id
-ORDER BY 
-    TotalQuantity DESC;
+FROM orderdetails OD
+JOIN orders O ON O.order_id = OD.order_id
+JOIN products P ON P.product_id = OD.product_id
+WHERE TO_CHAR(O.order_date, 'YYYY-MM') = '2025-01'
+GROUP BY TO_CHAR(O.order_date, 'YYYY-MM'), P.name, P.product_id
+ORDER BY TotalQuantity DESC;
 ```
 
 **Execution Time Before Optimization:** 12894.256 ms
@@ -163,34 +156,21 @@ ORDER BY
     
     ```sql
     INSERT INTO denormalized_orders_products (order_id, product_id, product_name, order_date, quantity)
-    SELECT 
-        O.order_id,
-        OD.product_id,
-        P.name AS product_name,
-        O.order_date,
-        OD.quantity
-    FROM 
-        orderdetails OD
-    JOIN 
-        orders O ON O.order_id = OD.order_id
-    JOIN 
-        products P ON P.product_id = OD.product_id;
+    SELECT O.order_id, OD.product_id, P.name AS product_name, O.order_date, OD.quantity
+    FROM orderdetails OD
+    JOIN orders O ON O.order_id = OD.order_id
+    JOIN products P ON P.product_id = OD.product_id;
     ```
 
     **Step 3**: Query the Denormalized Table:
     ```sql
     SELECT 
         TO_CHAR(order_date, 'YYYY-MM') AS Month,
-        product_name,
-        SUM(quantity) AS TotalQuantity
-    FROM 
-        denormalized_orders_products
+        product_name, SUM(quantity) AS TotalQuantity
+    FROM denormalized_orders_products
     WHERE order_date >= '2025-01-01 00:00:00' AND order_date < '2025-02-01 00:00:00'
-    	
-    GROUP BY 
-        TO_CHAR(order_date, 'YYYY-MM'), product_name
-    ORDER BY 
-        TotalQuantity DESC;
+    GROUP BY TO_CHAR(order_date, 'YYYY-MM'), product_name
+    ORDER BY TotalQuantity DESC;
     ```
 
 - Created a **Covering Index** that includes **(order_date,product_name,quantity)**:
@@ -207,16 +187,11 @@ CREATE INDEX idx_orderdate_productname_productquantity ON denormalized_orders_pr
 SELECT 
     C.first_name || ' ' || C.last_name AS CustomerName,
     SUM(O.total_amount) AS TotalAmount
-FROM 
-    orders O
-JOIN 
-    customers C ON O.customer_id = C.customer_id
-WHERE 
-    O.order_date >= DATE_TRUNC('day', NOW()) - INTERVAL '1 month'
-GROUP BY 
-    C.customer_id, C.first_name, C.last_name
-HAVING 
-    SUM(O.total_amount) > 500;
+FROM orders O
+JOIN customers C ON O.customer_id = C.customer_id
+WHERE O.order_date >= DATE_TRUNC('day', NOW()) - INTERVAL '1 month'
+GROUP BY C.customer_id, C.first_name, C.last_name
+HAVING SUM(O.total_amount) > 500;
 ```
 **Execution Time Before Optimization:** 4896.671 ms
 
@@ -229,16 +204,11 @@ HAVING
 SELECT 
     C.first_name || ' ' || C.last_name AS CustomerName,
     SUM(O.total_amount) AS TotalAmount
-FROM 
-    orders O
-JOIN 
-    customers C ON O.customer_id = C.customer_id
-WHERE 
-    O.order_date >= DATE_TRUNC('day', NOW()) - INTERVAL '1 month'
-GROUP BY 
-    C.customer_id
-HAVING 
-    SUM(O.total_amount) > 500;
+FROM orders O
+JOIN customers C ON O.customer_id = C.customer_id
+WHERE O.order_date >= DATE_TRUNC('day', NOW()) - INTERVAL '1 month'
+GROUP BY C.customer_id
+HAVING SUM(O.total_amount) > 500;
 ```
 
 - Created an **Index** for **(customer_id)** column in the orders table:
@@ -268,11 +238,14 @@ ORDER BY c.category_id, c.category_name;
 
 **Optimization Techniques:**
 
-- Created indexes:
+- Created an **Index** for **(category_id)** column in the products table:
+```sql
+CREATE INDEX products_category_index ON products(category_id);
+```
+- Created a **Covering Index** that includes **(category_id, category_name)**:
 
 ```sql
 CREATE INDEX categories_index ON categories(category_id, category_name);
-CREATE INDEX products_category_index ON products(category_id);
 ```
 
 ### 5. Top Customers by Total Spending
@@ -293,11 +266,10 @@ LIMIT 10;
 
 **Optimization Techniques:**
 
-- Created indexes:
+- Created an **Index** for **(total_amount)** column in the orders table:
 
 ```sql
-CREATE INDEX orders_customer_index ON orders(customer_id);
-CREATE INDEX orders_total_amount_index ON orders(total_amount);
+CREATE INDEX idx_orders_total_amount ON orders(total_amount);
 ```
 
 ### 6. Most Recent Orders with Customer Information (1000 Orders)
