@@ -242,11 +242,6 @@ ORDER BY c.category_id, c.category_name;
 ```sql
 CREATE INDEX products_category_index ON products(category_id);
 ```
-- Created a **Covering Index** that includes **(category_id, category_name)**:
-
-```sql
-CREATE INDEX categories_index ON categories(category_id, category_name);
-```
 
 ### 5. Top Customers by Total Spending
 
