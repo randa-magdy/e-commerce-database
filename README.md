@@ -108,7 +108,7 @@ WHERE order_date >= '2025-02-03 00:00:00' AND order_date < '2025-02-04 00:00:00'
 GROUP BY DATE(order_date);
 ```
 
-- Created an index on order date:
+- Create an **Index** in **(order date)** column on orders table:
 
 ```sql
 CREATE INDEX idx_orders_order_date ON orders(order_date);
@@ -173,7 +173,7 @@ ORDER BY TotalQuantity DESC;
     ORDER BY TotalQuantity DESC;
     ```
 
-- Created a **Covering Index** that includes **(order_date,product_name,quantity)**:
+- Create a **Covering Index** that includes **(order_date,product_name,quantity)**:
     
 ```sql
 CREATE INDEX idx_orderdate_productname_productquantity ON denormalized_orders_products(order_date,product_name,quantity) 
@@ -211,12 +211,12 @@ GROUP BY C.customer_id
 HAVING SUM(O.total_amount) > 500;
 ```
 
-- Created an **Index** for **(customer_id)** column in the orders table:
+- Create an **Index** for **(customer_id)** column in the orders table:
 ```sql
 CREATE INDEX idx_orders_customer_id ON orders (customer_id)
 ```
 
-- Created a **Covering Index** that includes **(customer_id, order_date,total_amount)**:
+- Create a **Covering Index** that includes **(customer_id, order_date,total_amount)**:
 ```sql
 CREATE INDEX idx_orders_covering ON orders (customer_id, order_date,total_amount);
 ```
@@ -238,7 +238,7 @@ ORDER BY c.category_id;
 
 **Optimization Techniques:**
 
-- Created an **Index** for **(category_id)** column in the products table:
+- Create an **Index** for **(category_id)** column in the products table:
 ```sql
 CREATE INDEX products_category_index ON products(category_id);
 ```
@@ -275,10 +275,10 @@ LIMIT 10;
     ORDER BY o.total_spending DESC;
 ```
 
-- Created **Covering Index** for **(customer_id,total_amount)** columns in the orders table:
+- Create **Covering Index** for **(customer_id,total_amount)** columns in the orders table:
 
 ```sql
-    CREATE INDEX idx_orders_customer_total ON orders(customer_id, total_amount);
+CREATE INDEX idx_orders_customer_total ON orders(customer_id, total_amount);
 ```
 
 ### 6. Most Recent Orders with Customer Information (1000 Orders)
@@ -299,7 +299,7 @@ LIMIT 1000;
 
 **Optimization Techniques:**
 
-- Created an index on order date:
+- Create an index on order date:
 
 ```sql
 CREATE INDEX orders_date_index ON orders(order_date);
@@ -321,7 +321,7 @@ ORDER BY stock_quantity ASC;
 
 **Optimization Techniques:**
 
-- Created an index on stock quantity:
+- Create an index on stock quantity:
 
 ```sql
 CREATE INDEX products_stock_quantity_index ON products(stock_quantity);
@@ -409,7 +409,7 @@ GROUP BY c.category_id;
     -- Drop the old table once migration is complete.
     DROP TABLE orderdetails_old;
   ```
-- Created an index on `product_id`:
+- Create an index on `product_id`:
 
 ```sql
 CREATE INDEX orderdetails_product ON orderdetails(product_id);
