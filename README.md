@@ -195,30 +195,35 @@ HAVING SUM(O.total_amount) > 500;
 ```
 **Execution Time Before Optimization:** 4896.671 ms
 
-**Execution Time After Optimization:** 1588.361 ms
+**Execution Time After Optimization:** 17.112 ms
 
 **Optimization Techniques:**
 
-- Rewrite the query by using only C.customer_id in `GROUP BY` clause:
+- Rewrite the query to use a subquery that filters orders first:
 ```sql
 SELECT 
     C.first_name || ' ' || C.last_name AS CustomerName,
-    SUM(O.total_amount) AS TotalAmount
-FROM orders O
-JOIN customers C ON O.customer_id = C.customer_id
-WHERE O.order_date >= DATE_TRUNC('day', NOW()) - INTERVAL '1 month'
-GROUP BY C.customer_id
-HAVING SUM(O.total_amount) > 500;
+    O.total_spent AS TotalAmount
+FROM customers C
+JOIN (
+    SELECT 
+        customer_id, 
+        SUM(total_amount) AS total_spent
+    FROM orders
+    WHERE order_date >= DATE_TRUNC('day', NOW()) - INTERVAL '1 month'
+    GROUP BY customer_id
+    HAVING SUM(total_amount) > 500
+) O ON C.customer_id = O.customer_id;
 ```
 
-- Create an **Index** for **(customer_id)** column in the orders table:
+- Create a **Covering Index** for **(customer_id, first_name, last_name)** columns in customers table :
 ```sql
-CREATE INDEX idx_orders_customer_id ON orders (customer_id)
+CREATE INDEX idx_customers_id_name ON customers(customer_id, first_name, last_name);
 ```
 
-- Create a **Covering Index** that includes **(customer_id, order_date,total_amount)**:
+- Create a **Covering Index** for **(customer_id, order_date,total_amount)** columns in orders table :
 ```sql
-CREATE INDEX idx_orders_covering ON orders (customer_id, order_date,total_amount);
+CREATE INDEX idx_orders_date__customer_amount ON orders(order_date, customer_id, total_amount);
 ```
 
 ### 4. Total Number of Products in Each Category
