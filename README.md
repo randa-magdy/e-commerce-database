@@ -152,7 +152,7 @@ ORDER BY TotalQuantity DESC;
     	quantity INT NOT NULL CHECK (quantity > 0)
     );
     ```
-    **Step 2**: Fiiling the Denormalized Table:
+    **Step 2**: Filling the Denormalized Table:
     
     ```sql
     INSERT INTO denormalized_orders_products (order_id, product_id, product_name, order_date, quantity)
