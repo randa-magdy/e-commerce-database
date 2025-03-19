@@ -239,10 +239,22 @@ ORDER BY c.category_id;
 
 **Execution Time Before Optimization:** 184.443 ms
 
-**Execution Time After Optimization:** 87.015 ms
+**Execution Time After Optimization:** 23.252 ms
 
 **Optimization Techniques:**
 
+- Rewrite the query to use a subquery that filters products first:
+```sql
+  SELECT c.category_id, c.category_name, 
+       COALESCE(p.product_count, 0) AS total_products
+FROM categories c
+LEFT JOIN (
+    SELECT category_id, COUNT(product_id) AS product_count
+    FROM products
+    GROUP BY category_id
+) p ON c.category_id = p.category_id
+ORDER BY c.category_id;
+```
 - Create an **Index** for **(category_id)** column in the products table:
 ```sql
 CREATE INDEX products_category_index ON products(category_id);
