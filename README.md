@@ -263,22 +263,22 @@ LIMIT 10;
 - Rewrite the query to reduces the amount of data that needs to be joined by aggregating the orders table first:
   
   ```sql
-SELECT c.customer_id, c.first_name || ' ' || c.last_name AS full_name, o.total_spending
-FROM customers c
-JOIN (
-  SELECT customer_id, SUM(total_amount) AS total_spending
-  FROM orders
-  GROUP BY customer_id
-  ORDER BY total_spending DESC
-  LIMIT 10
-) o ON c.customer_id = o.customer_id
-ORDER BY o.total_spending DESC;
+    SELECT c.customer_id, c.first_name || ' ' || c.last_name AS full_name, o.total_spending
+    FROM customers c
+    JOIN (
+      SELECT customer_id, SUM(total_amount) AS total_spending
+      FROM orders
+      GROUP BY customer_id
+      ORDER BY total_spending DESC
+      LIMIT 10
+    ) o ON c.customer_id = o.customer_id
+    ORDER BY o.total_spending DESC;
 ```
 
 - Created **Covering Index** for **(customer_id,total_amount)** columns in the orders table:
 
 ```sql
-CREATE INDEX idx_orders_customer_total ON orders(customer_id, total_amount);
+    CREATE INDEX idx_orders_customer_total ON orders(customer_id, total_amount);
 ```
 
 ### 6. Most Recent Orders with Customer Information (1000 Orders)
