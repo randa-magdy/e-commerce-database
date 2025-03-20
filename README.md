@@ -355,9 +355,9 @@ JOIN orderdetails od ON od.product_id=p.product_id
 GROUP BY c.category_id;
 ```
 
-**Execution Time Before Optimization:** 9535.885 ms
+**Execution Time Before Optimization:** 10535.885 ms
 
-**Execution Time After Optimization:** 5692.432 ms
+**Execution Time After Optimization:** 4459.114 ms
 
 **Optimization Techniques:**
 
