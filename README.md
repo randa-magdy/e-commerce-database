@@ -349,8 +349,9 @@ CREATE INDEX idx_products_stock_quantity ON products(stock_quantity);
 
 ```sql
 SELECT c.category_id, c.category_name, SUM(od.quantity * od.unit_price) AS total_revenue
-FROM orderdetails od JOIN products p ON od.product_id=p.product_id
-JOIN categories c ON c.category_id = p.category_id
+FROM categories c
+JOIN products p ON c.category_id = p.category_id 
+JOIN orderdetails od ON od.product_id=p.product_id  
 GROUP BY c.category_id;
 ```
 
@@ -360,7 +361,7 @@ GROUP BY c.category_id;
 
 **Optimization Techniques:**
 
-- Partitioned the `orderdetails` table for improved performance.
+- Partitione the `orderdetails` table for improved performance.
   
   ```sql
   -- Renme exist orderdetails to orderdetails_old
@@ -425,11 +426,44 @@ GROUP BY c.category_id;
     -- Drop the old table once migration is complete.
     DROP TABLE orderdetails_old;
   ```
-- Create an index on `product_id`:
+- Create an **Index** for **(product_id)** column in the orderdetails table:
 
 ```sql
 CREATE INDEX orderdetails_product ON orderdetails(product_id);
 ```
+**OR (Another Technique Instead of Partitioning)**
+
+- Apply Denormalization to Reduce Joins by Combining Data:
+  
+    **Steps to Apply Denormalization:**
+  
+    **Step 1**: Create a **Denormalized Table**:
+      
+    ```sql
+    CREATE TABLE denormaized_orderdetails_products_categories(
+    	category_id INT,
+    	category_name VARCHAR(100),
+    	product_id INT,
+    	quantity INT NOT NULL CHECK (quantity > 0),
+    	unit_price DECIMAL(10, 2) NOT NULL
+    )
+    ```
+    **Step 2**: Filling the Denormalized Table:
+    
+    ```sql
+    INSERT INTO denormaized_orderdetails_products_categories (category_id,category_name,product_id,quantity,unit_price)
+    SELECT c.category_id, c.category_name, od.quantity, od.unit_price
+    FROM categories c 
+    JOIN products p ON c.category_id = p.category_id 
+    JOIN orderdetails od ON od.product_id=p.product_id;
+    ```
+
+    **Step 3**: Query the Denormalized Table:
+    ```sql
+    SELECT category_id, category_name, SUM(quantity * unit_price) AS total_revenue
+    FROM denormaized_orderdetails_products_categories
+    GROUP BY category_id,category_name;
+    ```
 
 ##
 
