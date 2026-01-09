@@ -213,7 +213,7 @@ HAVING SUM(O.total_amount) > 500;
 
 **Optimization Techniques:**
 
-- Rewrite the query to use a Materialized View:
+- Rewrite the query to use a Materialized CTA:
 ```sql
 WITH qualifying_orders AS MATERIALIZED (
     SELECT
@@ -290,7 +290,7 @@ LIMIT 10;
 
 **Optimization Techniques:**
 
-- Rewrite the query using Materialized View:
+- Apply Materialized View:
 ```sql
 CREATE MATERIALIZED VIEW mv_customer_spending AS
 SELECT 
@@ -389,7 +389,7 @@ GROUP BY c.category_id;
 
 **Optimization Techniques:**
 
-- Rewrite the query using Materialized View:
+- Apply Materialized View:
 ```sql
 CREATE MATERIALIZED VIEW mv_category_revenue AS
 SELECT 
