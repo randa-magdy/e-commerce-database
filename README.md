@@ -120,7 +120,7 @@ WHERE order_date >= '2025-06-12 00:00:00' AND order_date < '2025-06-13 00:00:00'
 GROUP BY OrderDate;
 ```
 
-- Create an **Index** in **(order date)** column on orders table:
+- Create an **Covering Index** in **(order date)** column on orders table:
 
 ```sql
 CREATE INDEX idx_order_order_date_total_amount ON "order"(order_date,total_amount);
