@@ -269,7 +269,7 @@ LEFT JOIN (
 
 - Create an **Index** for **(category_id)** column in the products table:
 ```sql
-CREATE INDEX products_category_index ON product(category_id);
+CREATE INDEX idx_product_category_id ON product(category_id);
 ```
 
 ### 5. Top Customers by Total Spending
