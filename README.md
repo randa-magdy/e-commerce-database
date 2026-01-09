@@ -213,7 +213,7 @@ HAVING SUM(O.total_amount) > 500;
 
 **Optimization Techniques:**
 
-- Rewrite the query to use a Materialized CTA:
+- Rewrite the query to use a Materialized CTE:
 ```sql
 WITH qualifying_orders AS MATERIALIZED (
     SELECT
