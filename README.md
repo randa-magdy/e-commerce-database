@@ -331,7 +331,8 @@ LIMIT 1000;
 **Optimization Techniques:**
 
 - Rewrite the query to use a subquery that filters orders first:
-```
+  
+```sql
 SELECT o.order_id, o.order_date ,o.total_amount, c.customer_id, c.first_name ||' '|| c.last_name AS full_name, c.email 
 from customer c 
 join (
