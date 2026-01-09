@@ -172,7 +172,7 @@ ORDER BY TotalQuantity DESC;
     FROM order_details OD
     JOIN "order" O ON O.order_id = OD.order_id
     JOIN product P ON P.product_id = OD.product_id;
-```
+	```
 
     **Step 3**: Query the Denormalized Table:
     ```sql
